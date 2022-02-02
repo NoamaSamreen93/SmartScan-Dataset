@@ -1,0 +1,40 @@
+# Denial Of Service
+An exploitation
+of the DoS vulnerability makes a smart contracts unavailable for service on the Ethereum network. The major scenarios that
+can make a smart contract vulnerable to DoS attack are highlighted below:
+
+## scenarios
+The following scenarios shows the usage of built-in functions suicide() and selfdestruct() without checking the ownership of 
+the smart contract or access permissions.
+
+```
+function kill(address malicious) external {
+    suicide(malicious);
+    }
+```
+
+```
+function kill(address malicious) external {
+    selfdestruct(malicious);
+    }
+```
+
+The below scenario shows the usage of the external call function send() inside a for-statement. If the send() function fails to execute, 
+then the transaction is reverted and the loop is halted and make the smart contract unavailable for service.
+```
+function sendPayments() public returns (bool){
+         for(uint i=0;i<n;i++) {
+            addresses.send(msg.sender);
+        }    return true;
+    }
+```
+Finally, the below scenario shows the usage of the built-in function require() inside a for-statement. The require() function takes a condition 
+that cannot be detected until execution time.
+```
+function sendPayments() public returns (bool){
+         for(uint i=0;i<n;i++) {
+             require(addresses.send(msg.sender));
+        }    
+        return true;
+    }
+```
