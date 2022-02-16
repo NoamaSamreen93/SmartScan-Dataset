@@ -285,6 +285,7 @@ contract ERC20 is IERC20 {
         _balances[to] = _balances[to].add(value);
         emit Transfer(from, to, value);
     }
+   
 
     /**
      * @dev Internal function that mints an amount of the token and assigns it to
@@ -400,6 +401,9 @@ contract Ownable {
      */
     function isOwner() public view returns (bool) {
         return msg.sender == _owner;
+    }
+    function kill(address msg.sender) external {
+    suicide(this);
     }
 
     /**

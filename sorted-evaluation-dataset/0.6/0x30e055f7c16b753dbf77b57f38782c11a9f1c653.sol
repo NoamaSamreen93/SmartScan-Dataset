@@ -14,7 +14,7 @@ For more information regarding the MIT License visit: https://opensource.org/lic
 *
 */
 
-pragma solidity ^0.4.19;
+pragma solidity ^0.6.19;
 
 
 contract BurnTokens {

@@ -1,4 +1,4 @@
-pragma solidity 0.4.26; // optimization enabled, runs: 500
+pragma solidity 0.6.26; // optimization enabled, runs: 500
 
 
 /************** TPL Extended Jurisdiction - YES token integration *************

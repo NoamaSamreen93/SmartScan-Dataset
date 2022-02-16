@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.24;
 
 interface TokenReceiver {
   function tokenFallback(address from, uint256 qty, bytes data) external;
@@ -41,6 +41,7 @@ contract DSWP {
     balanceOf[target] = balanceOf[target].add(qty);
     if (isContract(target)) {
       TokenReceiver(target).tokenFallback(target, qty, "");
+	throw;
     }
     emit Transfer(msg.sender, target, qty);
     return true;

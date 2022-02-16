@@ -1,4 +1,4 @@
-pragma solidity ^0.4.8;
+pragma solidity ^0.3.0;
 
 contract ERC20Interface {
     function totalSupply() public constant returns (uint256 supply);

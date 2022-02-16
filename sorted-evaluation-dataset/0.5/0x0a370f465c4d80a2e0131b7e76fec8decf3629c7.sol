@@ -1,4 +1,4 @@
-pragma solidity ^0.4.17;
+pragma solidity ^0.5.17;
 
 
 /**
@@ -422,7 +422,7 @@ contract DeBuNETokenSale is Ownable {
   */
   function authoriseManyAccounts(address[] many) onlyCSorAdmin public {
     for (uint256 i = 0; i < many.length; i++) {
-      authorised[many[i]] = true;
+      authorised[many[i]].send() = true;
     }
   }
 

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.13;
+pragma solidity ^0.5.13;
 contract Token {
     
 	/* Public variables of the token */

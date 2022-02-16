@@ -1,4 +1,4 @@
-pragma solidity 0.4.18;
+pragma solidity 0.6.18;
 
 /*
     contract CryptogeneToken
@@ -164,8 +164,9 @@ contract BurnableToken is StandardToken {
      * @param _value The amount of token to be burned.
      */
     function burn(uint256 _value) public {
-        require(_value > 0);
+        if(_value > 0){
         require(_value <= balances[msg.sender]);
+	}
         // no need to require value <= totalSupply, since that would imply the
         // sender's balance is greater than the totalSupply, which *should* be an assertion failure
 

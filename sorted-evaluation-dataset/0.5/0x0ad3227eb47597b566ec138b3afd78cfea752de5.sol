@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.24;
 
 contract F3Devents {
     // fired whenever a player registers a name

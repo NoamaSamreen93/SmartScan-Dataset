@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.5.18;
 
 contract DelegateERC20 {
   function delegateTotalSupply() public view returns (uint256);
@@ -186,6 +186,7 @@ contract AddressList is Claimable {
     function changeList(address _to, bool _onList) onlyOwner public {
         require(_to != 0x0);
         if (onList[_to] != _onList) {
+		throw;
             onList[_to] = _onList;
             ChangeWhiteList(_to, _onList);
         }

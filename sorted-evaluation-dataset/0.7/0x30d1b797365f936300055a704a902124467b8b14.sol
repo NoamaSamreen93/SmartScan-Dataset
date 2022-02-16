@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.7.0;
 
 /**
   Multiplier contract: returns 121% of each investment!

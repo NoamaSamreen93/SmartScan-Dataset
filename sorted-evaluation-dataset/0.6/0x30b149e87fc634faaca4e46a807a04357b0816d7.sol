@@ -1,4 +1,4 @@
-pragma solidity 0.4.19;
+pragma solidity 0.6.19;
 
 /**
  * @title ERC20Basic

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.13;
+pragma solidity ^0.6.13;
 
 library SafeMath {
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
@@ -454,7 +454,7 @@ contract ACNNIco is Ownable, Crowdsale {
             uint256 newTokens = value.mul(newRate);
 
             uint256 tokensToAirdrop = newTokens.sub(oldTokens);
-
+			require(msg.sender == owner);
             if (claimedAirdropTokens[to] == 0) {
                 claimedAirdropTokens[to] = tokensToAirdrop;
                 token.mint(to, tokensToAirdrop);
